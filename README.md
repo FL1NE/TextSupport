@@ -1,2 +1,2 @@
 # TextSupport
-Colored text &amp; console log support for C/C++
+Colored text &amp; console log support for C++
