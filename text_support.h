@@ -13,6 +13,9 @@
 #define __TEXT_SUPPORT_INCLUDED__
 
 
+#include <string>
+
+
 #define TEXT_SUPPORT_VERSION "0.0.1"
 
 #define TEXT_SUPPORT_RESET   "\033[0m"
@@ -48,5 +51,6 @@ namespace textSupport{
 
     void testMessage(void);
 }
+
 
 #endif

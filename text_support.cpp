@@ -218,4 +218,3 @@ void textSupport::testMessage(){
     textSupport::errorMessage("This is ERROR Message.");
     textSupport::fatalMessage("This is FATAL ERROR Message.");
 }
-
