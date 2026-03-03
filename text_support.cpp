@@ -33,33 +33,34 @@ static std::string getTimestamp() {
 }
 
 
-static void printMessage(std::ostream& stream, const char* color, const char* label, const std::string& message) {
-    const std::string lbl(label);
-    stream << "[" << color << lbl << TEXT_SUPPORT_RESET << "]"
-           << std::string(7 - lbl.size(), ' ')
-           << getTimestamp() << "  " << message << std::endl;
-}
+struct LogEntry {
+    const char* label;
+    const char* color;
+    std::ostream* stream;
+};
+
+static const LogEntry LOG_TABLE[] = {
+    /* Debug   */ { "DBG",   TEXT_SUPPORT_BLUE,    &std::cout },
+    /* Info    */ { "INFO",  TEXT_SUPPORT_CYAN,    &std::cout },
+    /* Warning */ { "WARN",  TEXT_SUPPORT_YELLOW,  &std::cout },
+    /* Error   */ { "ERR",   TEXT_SUPPORT_RED,     &std::cerr },
+    /* Fatal   */ { "FATAL", TEXT_SUPPORT_BOLDRED, &std::cerr },
+};
 
 
-void textSupport::debugMessage(const std::string& message) {
-    printMessage(std::cout, TEXT_SUPPORT_BLUE, "DBG", message);
+void textSupport::log(LogLevel level, const std::string& message) {
+    const LogEntry& e = LOG_TABLE[static_cast<int>(level)];
+    const std::string lbl(e.label);
+    *e.stream << "[" << e.color << lbl << TEXT_SUPPORT_RESET << "]"
+              << std::string(7 - lbl.size(), ' ')
+              << getTimestamp() << "  " << message << std::endl;
 }
 
-void textSupport::infoMessage(const std::string& message) {
-    printMessage(std::cout, TEXT_SUPPORT_CYAN, "INFO", message);
-}
-
-void textSupport::warningMessage(const std::string& message) {
-    printMessage(std::cout, TEXT_SUPPORT_YELLOW, "WARN", message);
-}
-
-void textSupport::errorMessage(const std::string& message) {
-    printMessage(std::cerr, TEXT_SUPPORT_RED, "ERR", message);
-}
-
-void textSupport::fatalMessage(const std::string& message) {
-    printMessage(std::cerr, TEXT_SUPPORT_BOLDRED, "FATAL", message);
-}
+void textSupport::debugMessage(const std::string& message)   { log(LogLevel::Debug,   message); }
+void textSupport::infoMessage(const std::string& message)    { log(LogLevel::Info,    message); }
+void textSupport::warningMessage(const std::string& message) { log(LogLevel::Warning, message); }
+void textSupport::errorMessage(const std::string& message)   { log(LogLevel::Error,   message); }
+void textSupport::fatalMessage(const std::string& message)   { log(LogLevel::Fatal,   message); }
 
 
 void textSupport::testMessage() {

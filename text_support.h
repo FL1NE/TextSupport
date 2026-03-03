@@ -38,6 +38,10 @@
 
 
 namespace textSupport{
+    enum class LogLevel { Debug, Info, Warning, Error, Fatal };
+
+    void log(LogLevel level, const std::string& message);
+
     void debugMessage(const std::string& message);
     void infoMessage(const std::string& message);
     void warningMessage(const std::string& message);
