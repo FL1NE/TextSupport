@@ -33,53 +33,32 @@ static std::string getTimestamp() {
 }
 
 
-void textSupport::debugMessage(const char* message) {
-    debugMessage(std::string(message));
-}
-
-void textSupport::debugMessage(std::string message) {
-    std::cout << "[" << TEXT_SUPPORT_BLUE << "DBG" << TEXT_SUPPORT_RESET << "]    "
-              << getTimestamp() << "  " << message << std::endl;
-}
-
-
-void textSupport::infoMessage(const char* message) {
-    infoMessage(std::string(message));
-}
-
-void textSupport::infoMessage(std::string message) {
-    std::cout << "[" << TEXT_SUPPORT_CYAN << "INFO" << TEXT_SUPPORT_RESET << "]   "
-              << getTimestamp() << "  " << message << std::endl;
+static void printMessage(std::ostream& stream, const char* color, const char* label, const std::string& message) {
+    const std::string lbl(label);
+    stream << "[" << color << lbl << TEXT_SUPPORT_RESET << "]"
+           << std::string(7 - lbl.size(), ' ')
+           << getTimestamp() << "  " << message << std::endl;
 }
 
 
-void textSupport::warningMessage(const char* message) {
-    warningMessage(std::string(message));
+void textSupport::debugMessage(const std::string& message) {
+    printMessage(std::cout, TEXT_SUPPORT_BLUE, "DBG", message);
 }
 
-void textSupport::warningMessage(std::string message) {
-    std::cout << "[" << TEXT_SUPPORT_YELLOW << "WARN" << TEXT_SUPPORT_RESET << "]   "
-              << getTimestamp() << "  " << message << std::endl;
+void textSupport::infoMessage(const std::string& message) {
+    printMessage(std::cout, TEXT_SUPPORT_CYAN, "INFO", message);
 }
 
-
-void textSupport::errorMessage(const char* message) {
-    errorMessage(std::string(message));
+void textSupport::warningMessage(const std::string& message) {
+    printMessage(std::cout, TEXT_SUPPORT_YELLOW, "WARN", message);
 }
 
-void textSupport::errorMessage(std::string message) {
-    std::cerr << "[" << TEXT_SUPPORT_RED << "ERR" << TEXT_SUPPORT_RESET << "]    "
-              << getTimestamp() << "  " << message << std::endl;
+void textSupport::errorMessage(const std::string& message) {
+    printMessage(std::cerr, TEXT_SUPPORT_RED, "ERR", message);
 }
 
-
-void textSupport::fatalMessage(const char* message) {
-    fatalMessage(std::string(message));
-}
-
-void textSupport::fatalMessage(std::string message) {
-    std::cerr << "[" << TEXT_SUPPORT_BOLDRED << "FATAL" << TEXT_SUPPORT_RESET << "]  "
-              << getTimestamp() << "  " << message << std::endl;
+void textSupport::fatalMessage(const std::string& message) {
+    printMessage(std::cerr, TEXT_SUPPORT_BOLDRED, "FATAL", message);
 }
 
 

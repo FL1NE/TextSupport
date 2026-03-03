@@ -38,16 +38,11 @@
 
 
 namespace textSupport{
-    void debugMessage(const char* message);
-    void debugMessage(std::string message);
-    void infoMessage(const char* message);
-    void infoMessage(std::string message);
-    void warningMessage(const char* message);
-    void warningMessage(std::string message);
-    void errorMessage(const char* message);
-    void errorMessage(std::string message);
-    void fatalMessage(const char* message);
-    void fatalMessage(std::string message);
+    void debugMessage(const std::string& message);
+    void infoMessage(const std::string& message);
+    void warningMessage(const std::string& message);
+    void errorMessage(const std::string& message);
+    void fatalMessage(const std::string& message);
 
     void testMessage(void);
 }
