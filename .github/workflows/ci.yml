@@ -1,0 +1,21 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compile library
+        run: g++ -std=c++11 -Wall -Wextra -c text_support.cpp -o text_support.o
+
+      - name: Build test binary
+        run: g++ -std=c++11 -Wall -Wextra text_support.cpp test_main.cpp -o test_runner
+
+      - name: Run tests
+        run: ./test_runner
