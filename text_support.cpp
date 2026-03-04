@@ -16,200 +16,72 @@
 #include "text_support.h"
 
 
-void textSupport::debugMessage(const char* message){
+static std::string getTimestamp() {
     time_t timer;
-    struct tm *t_st;
+    struct tm t_st;
     time(&timer);
-    t_st = localtime(&timer);
+    localtime_r(&timer, &t_st);
 
-
-    std::cout << "[" << TEXT_SUPPORT_BLUE << "DBG" << TEXT_SUPPORT_RESET << "]" << "    "
-    << std::setw(4) << std::setfill('0') << t_st->tm_year + 1900 << "-"
-    << std::setw(2) << std::setfill('0') << t_st->tm_mon + 1 << "-"
-    << std::setw(2) << std::setfill('0') << t_st->tm_mday << " "
-    << std::setw(2) << std::setfill('0') << t_st->tm_hour << ":"
-    << std::setw(2) << std::setfill('0') << t_st->tm_min << ":"
-    << std::setw(2) << std::setfill('0') << t_st->tm_sec << "  "
-    <<  message << std::endl;
-}
-
-void textSupport::debugMessage(std::string message){
-    time_t timer;
-    struct tm *t_st;
-    time(&timer);
-    t_st = localtime(&timer);
-
-
-    std::cout << "[" << TEXT_SUPPORT_BLUE << "DBG" << TEXT_SUPPORT_RESET << "]" << "    "
-    << std::setw(4) << std::setfill('0') << t_st->tm_year + 1900 << "-"
-    << std::setw(2) << std::setfill('0') << t_st->tm_mon + 1 << "-"
-    << std::setw(2) << std::setfill('0') << t_st->tm_mday << " "
-    << std::setw(2) << std::setfill('0') << t_st->tm_hour << ":"
-    << std::setw(2) << std::setfill('0') << t_st->tm_min << ":"
-    << std::setw(2) << std::setfill('0') << t_st->tm_sec << "  "
-    <<  message << std::endl;
+    std::ostringstream oss;
+    oss << std::setw(4) << std::setfill('0') << t_st.tm_year + 1900 << "-"
+        << std::setw(2) << std::setfill('0') << t_st.tm_mon + 1 << "-"
+        << std::setw(2) << std::setfill('0') << t_st.tm_mday << " "
+        << std::setw(2) << std::setfill('0') << t_st.tm_hour << ":"
+        << std::setw(2) << std::setfill('0') << t_st.tm_min << ":"
+        << std::setw(2) << std::setfill('0') << t_st.tm_sec;
+    return oss.str();
 }
 
 
-void textSupport::infoMessage(const char* message){
-    time_t timer;
-    struct tm *t_st;
-    time(&timer);
-    t_st = localtime(&timer);
+struct LogEntry {
+    const char* label;
+    const char* color;
+    std::ostream* stream;
+};
+
+static const LogEntry LOG_TABLE[] = {
+    /* Debug   */ { "DBG",   TEXT_SUPPORT_BLUE,    &std::cout },
+    /* Info    */ { "INFO",  TEXT_SUPPORT_CYAN,    &std::cout },
+    /* Warning */ { "WARN",  TEXT_SUPPORT_YELLOW,  &std::cout },
+    /* Error   */ { "ERR",   TEXT_SUPPORT_RED,     &std::cerr },
+    /* Fatal   */ { "FATAL", TEXT_SUPPORT_BOLDRED, &std::cerr },
+};
 
 
-    std::cout << "[" << TEXT_SUPPORT_CYAN << "INFO" << TEXT_SUPPORT_RESET << "]" << "   "
-    << std::setw(4) << std::setfill('0') << t_st->tm_year + 1900 << "-"
-    << std::setw(2) << std::setfill('0') << t_st->tm_mon + 1 << "-"
-    << std::setw(2) << std::setfill('0') << t_st->tm_mday << " "
-    << std::setw(2) << std::setfill('0') << t_st->tm_hour << ":"
-    << std::setw(2) << std::setfill('0') << t_st->tm_min << ":"
-    << std::setw(2) << std::setfill('0') << t_st->tm_sec << "  "
-    <<  message << std::endl;
+void textSupport::log(LogLevel level, const std::string& message) {
+    const LogEntry& e = LOG_TABLE[static_cast<int>(level)];
+    const std::string lbl(e.label);
+    *e.stream << "[" << e.color << lbl << TEXT_SUPPORT_RESET << "]"
+              << std::string(7 - lbl.size(), ' ')
+              << getTimestamp() << "  " << message << std::endl;
 }
 
-void textSupport::infoMessage(std::string message){
-    time_t timer;
-    struct tm *t_st;
-    time(&timer);
-    t_st = localtime(&timer);
+void textSupport::debugMessage(const std::string& message)   { log(LogLevel::Debug,   message); }
+void textSupport::infoMessage(const std::string& message)    { log(LogLevel::Info,    message); }
+void textSupport::warningMessage(const std::string& message) { log(LogLevel::Warning, message); }
+void textSupport::errorMessage(const std::string& message)   { log(LogLevel::Error,   message); }
+void textSupport::fatalMessage(const std::string& message)   { log(LogLevel::Fatal,   message); }
 
 
-    std::cout << "[" << TEXT_SUPPORT_CYAN << "INFO" << TEXT_SUPPORT_RESET << "]" << "   "
-    << std::setw(4) << std::setfill('0') << t_st->tm_year + 1900 << "-"
-    << std::setw(2) << std::setfill('0') << t_st->tm_mon + 1 << "-"
-    << std::setw(2) << std::setfill('0') << t_st->tm_mday << " "
-    << std::setw(2) << std::setfill('0') << t_st->tm_hour << ":"
-    << std::setw(2) << std::setfill('0') << t_st->tm_min << ":"
-    << std::setw(2) << std::setfill('0') << t_st->tm_sec << "  "
-    <<  message << std::endl;
-}
-
-
-void textSupport::warningMessage(const char* message){
-    time_t timer;
-    struct tm *t_st;
-    time(&timer);
-    t_st = localtime(&timer);
-
-
-    std::cout << "[" << TEXT_SUPPORT_YELLOW << "WARN" << TEXT_SUPPORT_RESET << "]" << "   "
-    << std::setw(4) << std::setfill('0') << t_st->tm_year + 1900 << "-"
-    << std::setw(2) << std::setfill('0') << t_st->tm_mon + 1 << "-"
-    << std::setw(2) << std::setfill('0') << t_st->tm_mday << " "
-    << std::setw(2) << std::setfill('0') << t_st->tm_hour << ":"
-    << std::setw(2) << std::setfill('0') << t_st->tm_min << ":"
-    << std::setw(2) << std::setfill('0') << t_st->tm_sec << "  "
-    <<  message << std::endl;
-}
-
-void textSupport::warningMessage(std::string message){
-    time_t timer;
-    struct tm *t_st;
-    time(&timer);
-    t_st = localtime(&timer);
-
-
-    std::cout << "[" << TEXT_SUPPORT_YELLOW << "WARN" << TEXT_SUPPORT_RESET << "]" << "   "
-    << std::setw(4) << std::setfill('0') << t_st->tm_year + 1900 << "-"
-    << std::setw(2) << std::setfill('0') << t_st->tm_mon + 1 << "-"
-    << std::setw(2) << std::setfill('0') << t_st->tm_mday << " "
-    << std::setw(2) << std::setfill('0') << t_st->tm_hour << ":"
-    << std::setw(2) << std::setfill('0') << t_st->tm_min << ":"
-    << std::setw(2) << std::setfill('0') << t_st->tm_sec << "  "
-    <<  message << std::endl;
-}
-
-
-void textSupport::errorMessage(const char* message){
-    time_t timer;
-    struct tm *t_st;
-    time(&timer);
-    t_st = localtime(&timer);
-
-
-    std::cerr << "[" << TEXT_SUPPORT_RED << "ERR" << TEXT_SUPPORT_RESET << "]" << "    "
-    << std::setw(4) << std::setfill('0') << t_st->tm_year + 1900 << "-"
-    << std::setw(2) << std::setfill('0') << t_st->tm_mon + 1 << "-"
-    << std::setw(2) << std::setfill('0') << t_st->tm_mday << " "
-    << std::setw(2) << std::setfill('0') << t_st->tm_hour << ":"
-    << std::setw(2) << std::setfill('0') << t_st->tm_min << ":"
-    << std::setw(2) << std::setfill('0') << t_st->tm_sec << "  "
-    <<  message << std::endl;
-}
-
-void textSupport::errorMessage(std::string message){
-    time_t timer;
-    struct tm *t_st;
-    time(&timer);
-    t_st = localtime(&timer);
-
-
-    std::cerr << "[" << TEXT_SUPPORT_RED << "ERR" << TEXT_SUPPORT_RESET << "]" << "    "
-    << std::setw(4) << std::setfill('0') << t_st->tm_year + 1900 << "-"
-    << std::setw(2) << std::setfill('0') << t_st->tm_mon + 1 << "-"
-    << std::setw(2) << std::setfill('0') << t_st->tm_mday << " "
-    << std::setw(2) << std::setfill('0') << t_st->tm_hour << ":"
-    << std::setw(2) << std::setfill('0') << t_st->tm_min << ":"
-    << std::setw(2) << std::setfill('0') << t_st->tm_sec << "  "
-    <<  message << std::endl;
-}
-
-
-void textSupport::fatalMessage(const char* message){
-    time_t timer;
-    struct tm *t_st;
-    time(&timer);
-    t_st = localtime(&timer);
-
-
-    std::cerr << "[" << TEXT_SUPPORT_BOLDRED << "FATAL" << TEXT_SUPPORT_RESET << "]" << "  "
-    << std::setw(4) << std::setfill('0') << t_st->tm_year + 1900 << "-"
-    << std::setw(2) << std::setfill('0') << t_st->tm_mon + 1 << "-"
-    << std::setw(2) << std::setfill('0') << t_st->tm_mday << " "
-    << std::setw(2) << std::setfill('0') << t_st->tm_hour << ":"
-    << std::setw(2) << std::setfill('0') << t_st->tm_min << ":"
-    << std::setw(2) << std::setfill('0') << t_st->tm_sec << "  "
-    <<  message << std::endl;
-}
-
-void textSupport::fatalMessage(std::string message){
-    time_t timer;
-    struct tm *t_st;
-    time(&timer);
-    t_st = localtime(&timer);
-
-
-    std::cerr << "[" << TEXT_SUPPORT_BOLDRED << "FATAL" << TEXT_SUPPORT_RESET << "]" << "  "
-    << std::setw(4) << std::setfill('0') << t_st->tm_year + 1900 << "-"
-    << std::setw(2) << std::setfill('0') << t_st->tm_mon + 1 << "-"
-    << std::setw(2) << std::setfill('0') << t_st->tm_mday << " "
-    << std::setw(2) << std::setfill('0') << t_st->tm_hour << ":"
-    << std::setw(2) << std::setfill('0') << t_st->tm_min << ":"
-    << std::setw(2) << std::setfill('0') << t_st->tm_sec << "  "
-    <<  message << std::endl;
-}
-
-
-void textSupport::testMessage(){
+void textSupport::testMessage() {
     std::cout
-    << TEXT_SUPPORT_RESET << "RESET "
-    << TEXT_SUPPORT_BLACK << "BLACK "
-    << TEXT_SUPPORT_RED << "RED "
-    << TEXT_SUPPORT_GREEN << "GREEN "
-    << TEXT_SUPPORT_YELLOW << "YELLOW "
-    << TEXT_SUPPORT_BLUE << "BLUE "
+    << TEXT_SUPPORT_RESET   << "RESET "
+    << TEXT_SUPPORT_BLACK   << "BLACK "
+    << TEXT_SUPPORT_RED     << "RED "
+    << TEXT_SUPPORT_GREEN   << "GREEN "
+    << TEXT_SUPPORT_YELLOW  << "YELLOW "
+    << TEXT_SUPPORT_BLUE    << "BLUE "
     << TEXT_SUPPORT_MAGENTA << "MAGENTA "
-    << TEXT_SUPPORT_CYAN << "CYAN "
-    << TEXT_SUPPORT_WHITE << "WHITE "
-    << TEXT_SUPPORT_BOLDBLACK << "BOLDBLACK "
-    << TEXT_SUPPORT_BOLDRED << "BOLDRED "
-    << TEXT_SUPPORT_BOLDGREEN << "BOLDGREEN "
-    << TEXT_SUPPORT_BOLDYELLOW << "BOLDYELLOW "
-    << TEXT_SUPPORT_BOLDBLUE << "BOLDBLUE "
+    << TEXT_SUPPORT_CYAN    << "CYAN "
+    << TEXT_SUPPORT_WHITE   << "WHITE "
+    << TEXT_SUPPORT_BOLDBLACK   << "BOLDBLACK "
+    << TEXT_SUPPORT_BOLDRED     << "BOLDRED "
+    << TEXT_SUPPORT_BOLDGREEN   << "BOLDGREEN "
+    << TEXT_SUPPORT_BOLDYELLOW  << "BOLDYELLOW "
+    << TEXT_SUPPORT_BOLDBLUE    << "BOLDBLUE "
     << TEXT_SUPPORT_BOLDMAGENTA << "BOLDMAGENTA "
-    << TEXT_SUPPORT_BOLDCYAN << "BOLDCYAN "
-    << TEXT_SUPPORT_BOLDWHITE << "BOLDWHITE "
+    << TEXT_SUPPORT_BOLDCYAN    << "BOLDCYAN "
+    << TEXT_SUPPORT_BOLDWHITE   << "BOLDWHITE "
     << TEXT_SUPPORT_RESET << std::endl;
 
     textSupport::debugMessage("This is DEBUG Message.");
